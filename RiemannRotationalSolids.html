@@ -35,7 +35,7 @@ $(function () {
 
 var('t', 'y', 'z')
 
-@interact( layout = [ ['func'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
+@interact( layout = [ ['func', 'sum_type'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
 def riemann_revolution ( func = input_box( default = e^x + 2, label = "function", width = 20 ), 
         x_min = input_box( default = 0, label = "x min", width = 5 ), 
         x_max = input_box( default = 5, label = "x max", width = 5 ), 
@@ -43,7 +43,8 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
         yz_max = input_box( default = 160, label = "y and z max", width = 5 ), 
         lower = input_box( default = 0, label = "lower bound", width = 5 ),
         upper = input_box( default = 4, label = "upper bound", width = 5 ),
-        n = input_box(default = 4, label = "# of intervals", width = 5 ) ) :
+        n = input_box(default = 4, label = "# of intervals", width = 5 ), 
+        sum_type = selector(['left', 'right', 'midpoint', 'minimum', 'maximum'], label = "type of sum") ) :
             
     # Define the function f(x)
     f(x) = func.function(x)
@@ -61,25 +62,57 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
     min = lower
     midpoint = lower + half_width
     max = lower + width
-    rectangles = polygon([ (0,0), (1,0), (2,0) ])
+    cylinders = polygon([ (0,0), (1,0), (2,0) ])
     sum = 0
-    f_max = f(x).find_local_maximum(min, max)
-    max_height = f_max[0]
-    f_min = f(x).find_local_minimum(min, max)
-    min_height = f_min[0]
     
-    # Left sum step
-    for i in (0..n-1) :
-        int_min = min + i * width
-        int_max = max + i * width
-        rectangles += parametric_plot3d( (x, f(int_min)*cos(t), f(int_min)*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
-        sum += width * pi * f(int_min)^2
+    # Left sum
+    if sum_type == 'left' :  
+        for i in (0..n-1) :
+            int_min = min + i * width
+            int_max = max + i * width
+            cylinders += parametric_plot3d( (x, f(int_min)*cos(t), f(int_min)*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            sum += width * pi * f(int_min)^2
         
+    # Right sum 
+    if sum_type == 'right' :
+        for i in (0..n-1) :
+            int_min = min + i * width
+            int_max = max + i * width
+            cylinders += parametric_plot3d( (x, f(int_max)*cos(t), f(int_max)*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            sum += width * pi * f(int_max)^2    
         
+    # Midpoint sum
+    if sum_type == 'midpoint' :
+        for i in (0..n-1) :
+            int_min = min + i * width
+            int_mid = midpoint + i * width
+            int_max = max + i * width
+            height = f(int_mid)
+            cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            sum += width * pi * height^2
+            
+    # Minimum sum
+    if sum_type == 'minimum' :
+        for i in (0..n-1) :
+            int_min = min + i * width
+            int_max = max + i * width
+            f_min = f(x).find_local_minimum(int_min, int_max)
+            height = f_min[0]
+            cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            sum += width * pi * height^2
+            
+    # Maximum sum
+    if sum_type == 'maximum' :
+        for i in (0..n-1) :
+            int_min = min + i * width
+            int_max = max + i * width
+            f_max = f(x).find_local_maximum(int_min, int_max)
+            height = f_max[0]
+            cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            sum += width * pi * height^2
+            
         
-        
-        
-    graph = x_axis + y_axis + z_axis + graph2d + rectangles
+    graph = x_axis + y_axis + z_axis + graph2d + cylinders
     graph.show()
     
     actual_curve = x_axis + y_axis + z_axis + graph2d + graph3d
