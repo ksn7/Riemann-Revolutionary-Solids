@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Riemann Revolutionary Solids</title>
+    <script src="https://sagecell.sagemath.org/static/jquery.min.js"></script>
+    <script src="https://sagecell.sagemath.org/embedded_sagecell.js"></script>
+    <script>
+$(function () {
+    // Make *any* div with class 'compute' a Sage cell
+    sagecell.makeSagecell({inputLocation: 'div.compute',
+    						template:       sagecell.templates.minimal,
+                           evalButtonText: 'Launch the Interactive Applet Now'});
+});
+    </script>
+  </head>
+  <body style="width: 1000px;">
+
+<! you may start modifying below this point!>
+<! you may start modifying below this point!>
+<! you may start modifying below this point!>
+<! you may start modifying below this point!>
+<! you may start modifying below this point!>
+
+  <h1>Riemann Revolutionary Solids</h1>
+
+<p>An Interactive Applet powered by Sage and MathJax.</p>
+<p>(By Kelsey Norman with HTML code from Prof. Gregory V. Bard)</p>
+
+<hr>
+
+<div class="compute">
+<script type="text/x-sage">
+
+var('t', 'y', 'z')
+
+@interact( layout = [ ['func'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
+def riemann_revolution ( func = input_box( default = e^x + 2, label = "function", width = 20 ), 
+        x_min = input_box( default = 0, label = "x min", width = 5 ), 
+        x_max = input_box( default = 5, label = "x max", width = 5 ), 
+        yz_min = input_box( default = -160, label = "y and z min", width = 5 ), 
+        yz_max = input_box( default = 160, label = "y and z max", width = 5 ), 
+        lower = input_box( default = 0, label = "lower bound", width = 5 ),
+        upper = input_box( default = 4, label = "upper bound", width = 5 ),
+        n = input_box(default = 4, label = "# of intervals", width = 5 ) ) :
+            
+    # Define the function f(x)
+    f(x) = func.function(x)
+    
+    # Set up for graphing axes, original function, and rotational solid
+    x_axis = parametric_plot( (x, 0, 0), (x_min, x_max), color = 'yellow', thickness = 2, aspect_ratio = 'automatic' )
+    y_axis = parametric_plot( (0, y, 0), (yz_min, yz_max), color = 'green', thickness = 2, aspect_ratio = 'automatic' )
+    z_axis = parametric_plot( (0, 0, z), (yz_min, yz_max), color = 'red', thickness = 2, aspect_ratio = 'automatic' )
+    graph2d = parametric_plot( (x, f(x) ), (x, x_min, x_max), color = 'fuchsia', thickness = 3 )
+    graph3d = parametric_plot3d( ( x, f(x)*cos(t), f(x)*sin(t) ), (x, lower, upper), (t, 0, 2*pi ), color = '#6683c2' )
+    
+    # Set up for Riemann rectangles
+    width = (upper - lower) / n
+    half_width = width / 2
+    min = lower
+    midpoint = lower + half_width
+    max = lower + width
+    rectangles = polygon([ (0,0), (1,0), (2,0) ])
+    sum = 0
+    f_max = f(x).find_local_maximum(min, max)
+    max_height = f_max[0]
+    f_min = f(x).find_local_minimum(min, max)
+    min_height = f_min[0]
+    
+    # Left sum step
+    for i in (0..n-1) :
+        int_min = min + i * width
+        int_max = max + i * width
+        rectangles += parametric_plot3d( (x, f(int_min)*cos(t), f(int_min)*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+        sum += width * pi * f(int_min)^2
+        
+        
+        
+        
+        
+    graph = x_axis + y_axis + z_axis + graph2d + rectangles
+    graph.show()
+    
+    actual_curve = x_axis + y_axis + z_axis + graph2d + graph3d
+    actual_curve.show()
+
+
+</script>
+</div>
+
+<h2>Discussion</h2>
+
+<p>blah blah blah</p>
+
+<p>yada yada yada</p>
+
+<p>blah blah blah</p>
+
+<hr>
+Last modified on December 28th, 2013.
+</body>
+</html>
