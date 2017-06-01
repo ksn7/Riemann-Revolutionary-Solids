@@ -35,7 +35,7 @@ $(function () {
 
 var('t', 'y', 'z')
 
-@interact( layout = [ ['func', 'sum_type'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
+@interact( layout = [ ['func', 'sum_type', 'sums'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
 def riemann_revolution ( func = input_box( default = e^x + 2, label = "function", width = 20 ), 
         x_min = input_box( default = 0, label = "x min", width = 5 ), 
         x_max = input_box( default = 5, label = "x max", width = 5 ), 
@@ -44,7 +44,8 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
         lower = input_box( default = 0, label = "lower bound", width = 5 ),
         upper = input_box( default = 4, label = "upper bound", width = 5 ),
         n = input_box(default = 4, label = "# of intervals", width = 5 ), 
-        sum_type = selector(['left', 'right', 'midpoint', 'minimum', 'maximum'], label = "type of sum") ) :
+        sum_type = selector(['left', 'right', 'midpoint', 'minimum', 'maximum'], label = "type of sum"),
+        sums = False ) :
             
     # Define the function f(x)
     f(x) = func.function(x)
@@ -117,18 +118,15 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
     
     actual_curve = x_axis + y_axis + z_axis + graph2d + graph3d
     actual_curve.show()
+    
+    if sums == True :
+        print( "The sum of the areas of the rotated disks is %f." % sum )
+        area = integral( pi * f(x)^2, x, lower, upper )
+        print( "The actual area under the curve is %f." % area )
 
 
 </script>
 </div>
-
-<h2>Discussion</h2>
-
-<p>blah blah blah</p>
-
-<p>yada yada yada</p>
-
-<p>blah blah blah</p>
 
 <hr>
 Last modified on June 1st, 2017.
