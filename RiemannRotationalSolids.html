@@ -17,12 +17,6 @@ $(function () {
   </head>
   <body style="width: 1000px;">
 
-<! you may start modifying below this point!>
-<! you may start modifying below this point!>
-<! you may start modifying below this point!>
-<! you may start modifying below this point!>
-<! you may start modifying below this point!>
-
   <h1>Riemann Revolutionary Solids</h1>
 
 <p>An Interactive Applet powered by Sage and MathJax.</p>
@@ -73,10 +67,16 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
         for i in (0..n-1) :
             int_min = min + i * width
             int_max = max + i * width
-            cylinders += parametric_plot3d( (x, f(int_min)*cos(t), f(int_min)*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_min, r*f(int_min)*cos(t), r*f(int_min)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_max, r*f(int_min)*cos(t), r*f(int_min)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            height = f(int_min)
+            cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
+            if f(int_min) < f(int_max) :
+                disk_caps += parametric_plot3d( (int_min, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            else: 
+                disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            if i == n-1 :
+                disk_caps += parametric_plot3d( (upper, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * f(int_min)^2
+        disk_caps += parametric_plot3d( (lower, r*f(lower)*cos(t), r*f(lower)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
         
     # Right sum 
     if sum_type == 'right' :
@@ -96,8 +96,8 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
             int_max = max + i * width
             height = f(int_mid)
             cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_min, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_max, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_min, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * height^2
             
     # Minimum sum
@@ -108,8 +108,8 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
             f_min = f(x).find_local_minimum(int_min, int_max)
             height = f_min[0]
             cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_min, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_max, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_min, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * height^2
             
     # Maximum sum
@@ -120,8 +120,8 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
             f_max = f(x).find_local_maximum(int_min, int_max)
             height = f_max[0]
             cylinders += parametric_plot3d( (x, height*cos(t), height*sin(t) ), (x, int_min, int_max), (t, 0, 2*pi), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_min, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
-            disk_caps += parametric_plot3d( (int_max, r*f(height)*cos(t), r*f(height)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_min, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+            disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * height^2
             
         
@@ -136,11 +136,11 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "function"
         area = integral( pi * f(x)^2, x, lower, upper )
         print( "The actual area under the curve is %f." % area )
 
-
 </script>
 </div>
 
+
 <hr>
-Last modified on June 1st, 2017.
+Last modified on June 5th, 2017.
 </body>
 </html>
