@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>Riemann Revolutionary Solids</title>
+    <title>Rotational Solids</title>
     <script src="https://sagecell.sagemath.org/static/jquery.min.js"></script>
     <script src="https://sagecell.sagemath.org/embedded_sagecell.js"></script>
     <script>
@@ -17,7 +17,7 @@ $(function () {
   </head>
   <body style="width: 1000px;">
 
-  <h1>Riemann Revolutionary Solids</h1>
+  <h1>Rotational Solids</h1>
 
 <p>An Interactive Applet powered by Sage and MathJax.</p>
 <p>(By Kelsey Norman with HTML code from Prof. Gregory V. Bard)</p>
@@ -34,9 +34,13 @@ $(function () {
 </script>
 
 <div class="latex">
-    \textrm{This demo shows the cylinders created by computing the Riemann sums to approximate a curve and rotating them around the axis.}
+    \textrm{This demo shows the solids created by rotating curves or rectangles around the x-axis.}
     \\
     \textrm{The actual area is calculated by } V = \pi \int_a^bf(x)^2
+    \\
+    \textrm{Here, the x-axis is yellow, the y-axis is green, and the z-axis is red.}
+    \\
+    \textrm{The original (non-rotated) curve is shown in pink.}
 </div>
 
 <hr>
@@ -46,41 +50,49 @@ $(function () {
 
 var('t', 'y', 'z', 'r')
 
-@interact( layout = [ ['func', 'sum_type', 'sums'], ['x_min', 'x_max', 'yz_min', 'yz_max'], ['lower', 'upper', 'n'] ] )
+@interact( layout = [ ['func', 'sum_type', 'volume'], ['x_min', 'x_max', 'n'] ] )
 def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ", width = 20 ), 
         x_min = input_box( default = 0, label = "x min", width = 5 ), 
-        x_max = input_box( default = 5, label = "x max", width = 5 ), 
-        yz_min = input_box( default = -160, label = "y and z min", width = 5 ), 
-        yz_max = input_box( default = 160, label = "y and z max", width = 5 ), 
-        lower = input_box( default = 0, label = "a", width = 5 ),
-        upper = input_box( default = 4, label = "b", width = 5 ),
+        x_max = input_box( default = 4, label = "x max", width = 5 ), 
         n = input_box(default = 4, label = "# of intervals", width = 5 ), 
-        sum_type = selector(['left', 'right', 'midpoint', 'minimum', 'maximum'], label = "type of sum"),
-        sums = False ) :
+        sum_type = selector(['Riemann left', 'Riemann right', 'Riemann midpoint', 'Riemann minimum', 'Riemann maximum', 'Actual solid'], label = "type of solid"),
+        volume = False ) :
             
     # Define the function f(x)
     f(x) = func.function(x)
     
+    # Set height for y and z axes
+    (height_max, prec1) = find_local_maximum( f, x_min, x_max )
+    (height_min, prec2) = find_local_minimum( f, x_min, x_max )
+    if abs(height_max) >= abs(height_min):
+        height = abs(height_max)
+    else:
+        height = abs(height_min)
+    
     # Set up for graphing axes, original function, and rotational solid
-    x_axis = parametric_plot( (x, 0, 0), (x_min, x_max), color = 'yellow', thickness = 2, aspect_ratio = 'automatic' )
-    y_axis = parametric_plot( (0, y, 0), (yz_min, yz_max), color = 'green', thickness = 2, aspect_ratio = 'automatic' )
-    z_axis = parametric_plot( (0, 0, z), (yz_min, yz_max), color = 'red', thickness = 2, aspect_ratio = 'automatic' )
+    x_axis = parametric_plot( (x, 0, 0), (x_min, x_max), color = 'yellow', thickness = 3, 
+        aspect_ratio = 'automatic' )
+    y_axis = parametric_plot( (0, y, 0), (-height, height), color = 'green', thickness = 3, 
+        aspect_ratio = 'automatic' )
+    z_axis = parametric_plot( (0, 0, z), (-height, height), color = 'red', thickness = 3, 
+        aspect_ratio = 'automatic' )
     graph2d = parametric_plot( (x, f(x) ), (x, x_min, x_max), color = 'fuchsia', thickness = 3 )
-    graph3d = parametric_plot3d( ( x, f(x)*cos(t), f(x)*sin(t) ), (x, lower, upper), (t, 0, 2*pi ), color = '#6683c2' )
-    disk_cap3d = parametric_plot3d( (upper, r*f(upper)*cos(t), r*f(upper)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
+    graph3d = parametric_plot3d( ( x, f(x)*cos(t), f(x)*sin(t) ), (x, x_min, x_max), (t, 0, 2*pi ), color = '#6683c2' )
+    disk_cap3d = parametric_plot3d( (x_min, r*f(x_min)*cos(t), r*f(x_min)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
+    disk_cap3d += parametric_plot3d( (x_max, r*f(x_max)*cos(t), r*f(x_max)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
     
     # Set up for Riemann rectangles
-    width = (upper - lower) / n
+    width = (x_max - x_min) / n
     half_width = width / 2
-    min = lower
-    midpoint = lower + half_width
-    max = lower + width
+    min = x_min
+    midpoint = x_min + half_width
+    max = x_min + width
     cylinders = polygon([ (0,0), (1,0), (2,0) ])
     disk_caps = polygon([ (0,0), (1,0), (2,0) ])
     sum = 0
     
     # Left sum
-    if sum_type == 'left' :  
+    if sum_type == 'Riemann left' :  
         for i in (0..n-1) :
             int_min = min + i * width
             int_max = max + i * width
@@ -91,12 +103,12 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
             else: 
                 disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             if i == n-1 :
-                disk_caps += parametric_plot3d( (upper, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+                disk_caps += parametric_plot3d( (x_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * f(int_min)^2
-        disk_caps += parametric_plot3d( (lower, r*f(lower)*cos(t), r*f(lower)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
+        disk_caps += parametric_plot3d( (x_min, r*f(x_min)*cos(t), r*f(x_min)*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
         
     # Right sum 
-    if sum_type == 'right' :
+    elif sum_type == 'Riemann right' :
         for i in (0..n-1) :
             int_min = min + i * width
             int_max = max + i * width
@@ -106,7 +118,7 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
             sum += width * pi * f(int_max)^2    
         
     # Midpoint sum
-    if sum_type == 'midpoint' :
+    elif sum_type == 'Riemann midpoint' :
         for i in (0..n-1) :
             int_min = min + i * width
             int_mid = midpoint + i * width
@@ -118,7 +130,7 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
             sum += width * pi * height^2
             
     # Minimum sum
-    if sum_type == 'minimum' :
+    elif sum_type == 'Riemann minimum' :
         for i in (0..n-1) :
             int_min = min + i * width
             int_max = max + i * width
@@ -130,7 +142,7 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
             sum += width * pi * height^2
             
     # Maximum sum
-    if sum_type == 'maximum' :
+    elif sum_type == 'Riemann maximum' :
         for i in (0..n-1) :
             int_min = min + i * width
             int_max = max + i * width
@@ -140,24 +152,29 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
             disk_caps += parametric_plot3d( (int_min, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             disk_caps += parametric_plot3d( (int_max, r*height*cos(t), r*height*sin(t) ), (t, 0, 2*pi), (r, 0, 1), color = '#14eb2a' )
             sum += width * pi * height^2
-            
-        
-    graph = x_axis + y_axis + z_axis + graph2d + cylinders + disk_caps
-    graph.show()
     
-#    actual_curve = x_axis + y_axis + z_axis + graph2d + graph3d + disk_cap3d
-#    actual_curve.show()
+    # Actual solid
+    elif sum_type == 'Actual solid' :          
+        actual_curve = x_axis + y_axis + z_axis + graph2d + graph3d + disk_cap3d
+        actual_curve.show()
     
-    if sums == True :
-        print( "The sum of the areas of the rotated disks is %f." % sum )
-        area = integral( pi * f(x)^2, x, lower, upper )
-        print( "The actual area under the curve is %f." % area )
+    # If not graphing the actual solid, show the cylinders        
+    if not sum_type == 'Actual solid' :    
+        graph = x_axis + y_axis + z_axis + graph2d + cylinders + disk_caps
+        graph.show()
+    
+    # If chosen to display the volumes, print whichever are appropriate
+    if volume == True :
+        if not sum_type == 'Actual solid' :
+            print( "The sum of the volumes of the rotated disks is %f." % sum )
+        (area, prec) = numerical_integral( pi * f^2, x_min, x_max )
+        print "The actual volume is " + str(area) + "."
 
 </script>
 </div>
 
 
 <hr>
-Last modified on June 21st, 2017.
+Last modified on June 26th, 2017.
 </body>
 </html>
