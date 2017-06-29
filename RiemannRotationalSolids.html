@@ -50,16 +50,18 @@ $(function () {
 
 var('t', 'y', 'z', 'r')
 
-@interact( layout = [ ['func', 'sum_type', 'volume'], ['x_min', 'x_max', 'n'] ] )
+@interact( layout = [ ['func', 'axis'], ['sum_type', 'volume'], ['x_min', 'x_max', 'n'] ] )
 def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ", width = 20 ), 
         x_min = input_box( default = 0, label = "x min", width = 5 ), 
         x_max = input_box( default = 4, label = "x max", width = 5 ), 
         n = input_box(default = 4, label = "# of intervals", width = 5 ), 
-        sum_type = selector(['Riemann left', 'Riemann right', 'Riemann midpoint', 'Riemann minimum', 'Riemann maximum', 'Actual solid'], label = "type of solid"),
+        sum_type = selector(['Riemann left', 'Riemann right', 'Riemann midpoint', 'Riemann minimum',
+            'Riemann maximum', 'Actual solid'], label = "type of solid"),
+        axis = input_box( default = 0, label = "axis of rotation", width = 5 ),
         volume = False ) :
             
     # Define the function f(x)
-    f(x) = func.function(x)
+    f(x) = func.function(x) + axis
     
     # Set height for y and z axes
     (height_max, prec1) = find_local_maximum( f, x_min, x_max )
@@ -76,10 +78,12 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
         aspect_ratio = 'automatic' )
     z_axis = parametric_plot( (0, 0, z), (-height, height), color = 'red', thickness = 3, 
         aspect_ratio = 'automatic' )
+    rot_axis = parametric_plot( (axis, 0, 0), (x_min, x_max), color = '#cc33ff', thickness = 3, 
+        aspect_ratio = 'automatic' )
     graph2d = parametric_plot( (x, f(x) ), (x, x_min, x_max), color = 'fuchsia', thickness = 3 )
-    graph3d = parametric_plot3d( ( x, f(x)*cos(t), f(x)*sin(t) ), (x, x_min, x_max), (t, 0, 2*pi ), color = '#6683c2' )
-    disk_cap3d = parametric_plot3d( (x_min, r*f(x_min)*cos(t), r*f(x_min)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
-    disk_cap3d += parametric_plot3d( (x_max, r*f(x_max)*cos(t), r*f(x_max)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
+    graph3d = parametric_plot3d( ( x, f(x)*cos(t) + axis, f(x)*sin(t) ), (x, x_min, x_max), (t, 0, 2*pi ), color = '#6683c2' )
+    disk_cap3d = parametric_plot3d( (x_min, r*f(x_min)*cos(t) + axis, r*f(x_min)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
+    disk_cap3d += parametric_plot3d( (x_max, r*f(x_max)*cos(t) + axis, r*f(x_max)*sin(t) ), (r, 0, 1), (t, 0, 2*pi), color = '#6683c2' )
     
     # Set up for Riemann rectangles
     width = (x_max - x_min) / n
@@ -168,13 +172,16 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
         if not sum_type == 'Actual solid' :
             print( "The sum of the volumes of the rotated disks is %f." % sum )
         (area, prec) = numerical_integral( pi * f^2, x_min, x_max )
-        print "The actual volume is " + str(area) + "."
+        l=0
+        while prec <= 10^-l:
+            l += 1
+        print "The actual volume is " + str(area) + ", accurate to 10^-" + str(l) + "."
 
 </script>
 </div>
 
 
 <hr>
-Last modified on June 26th, 2017.
+Last modified on June 29th, 2017.
 </body>
 </html>
