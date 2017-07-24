@@ -199,20 +199,22 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
         graph.show( )
     
     # If chosen to display the volumes, print whichever are appropriate
+    text1 = ""
     if volume == True :
         if not sum_type == 'Actual solid' :
-            print( "The sum of the volumes of the rotated disks is %f." % sum )
+            text1 += "The sum of the volumes of the rotated disks is %f." % sum 
         (area, prec) = numerical_integral( pi * f^2, x_min, x_max )
         l=0
         while prec <= 10^-l:
             l += 1
-        print "The actual volume is " + str(area) + ", accurate to 10^-" + str(l) + "."
+        text1 += "\nThe actual volume is " + str(area) + ", accurate to 10^-" + str(l) + "."
+        pretty_print( text1 )
 
 </script>
 </div>
 
 
 <hr>
-Last modified on July 21st, 2017.
+Last modified on July 24th, 2017.
 </body>
 </html>
