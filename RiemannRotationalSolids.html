@@ -51,11 +51,11 @@ $(function () {
 var('t', 'y', 'z', 'r')
 
 @interact( layout = [ ['func', 'sum_type', 'rotational_axis'], ['n', 'volume'], ['x_min', 'x_max', 'y_min', 'y_max'] ] )
-def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ", width = 15 ), 
-        x_min = input_box( default = 0, label = "x min", width = 5 ), 
-        x_max = input_box( default = 4, label = "x max", width = 5 ), 
-        y_min = input_box( default = -60, label = "y min", width = 5 ),
-        y_max = input_box( default = 60, label = "y max", width = 5 ),
+def riemann_revolution ( func = input_box( default = e^x + 2, label = "$f(x) = $", width = 15 ), 
+        x_min = input_box( default = 0, label = "$x_{min}$", width = 5 ), 
+        x_max = input_box( default = 4, label = "$x_{max}$", width = 5 ), 
+        y_min = input_box( default = -60, label = "$y_{min}$", width = 5 ),
+        y_max = input_box( default = 60, label = "$y_{max}$", width = 5 ),
         n = input_box(default = 4, label = "# of intervals", width = 5 ), 
         sum_type = selector(['Riemann left', 'Riemann right', 'Riemann midpoint', 'Riemann minimum',
             'Riemann maximum', 'Actual solid'], label = "type of solid"),
@@ -202,7 +202,7 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
     text1 = ""
     if volume == True :
         if not sum_type == 'Actual solid' :
-            text1 += "The sum of the volumes of the rotated disks is %f." % sum 
+            text1 += "The sum of the volumes of the rotated disks is %6.7f." % sum
         (area, prec) = numerical_integral( pi * f^2, x_min, x_max )
         l=0
         while prec <= 10^-l:
@@ -213,8 +213,7 @@ def riemann_revolution ( func = input_box( default = e^x + 2, label = "f(x) = ",
 </script>
 </div>
 
-
 <hr>
-Last modified on July 24th, 2017.
+Last modified on August 17th, 2017.
 </body>
 </html>
